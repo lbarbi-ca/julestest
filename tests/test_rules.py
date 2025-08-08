@@ -1,10 +1,6 @@
-import sys
-import os
 import pytest
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from src.uno.game import Game
-from src.uno.card import Card, Color, CardType
+from uno.game import Game
+from uno.card import Card, Color, CardType
 
 # Helper function to set up a game with a predictable state
 def setup_game_for_testing(num_players=2):

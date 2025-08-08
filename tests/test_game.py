@@ -1,8 +1,4 @@
-import sys
-import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from src.uno.game import Game
+from uno.game import Game
 
 def test_game_creation():
     player_names = ["Player 1", "Player 2", "Player 3"]

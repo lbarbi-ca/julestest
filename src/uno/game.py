@@ -9,6 +9,7 @@ class Game:
         self.deck.shuffle()
         self.discard_pile = []
         self.current_player_index = 0
+        self.last_player_played_index = None
         self.game_direction = 1  # 1 for clockwise, -1 for counter-clockwise
         self.current_color = None
         self._deal_initial_cards()
@@ -94,14 +95,14 @@ class Game:
         return False
 
     def play_turn(self, card_index: int | None, chosen_color: Color = None, called_uno: bool = False):
-        # UNO Penalty Check for the *previous* player
-        prev_player_index = (self.current_player_index - self.game_direction + len(self.players)) % len(self.players)
-        prev_player = self.players[prev_player_index]
-        if len(prev_player.hand) == 1 and not prev_player.uno_status:
-            # Player is penalized for not calling UNO
-            prev_player.add_card_to_hand(self.draw_card_from_deck())
-            prev_player.add_card_to_hand(self.draw_card_from_deck())
-            prev_player.uno_status = False  # Status is reset after penalty
+        # At the start of a turn, check if the *previous* player should be penalized for not calling UNO.
+        if self.last_player_played_index is not None:
+            prev_player = self.players[self.last_player_played_index]
+            if len(prev_player.hand) == 1 and not prev_player.uno_status:
+                # Player is penalized for not calling UNO
+                prev_player.add_card_to_hand(self.draw_card_from_deck())
+                prev_player.add_card_to_hand(self.draw_card_from_deck())
+                prev_player.uno_status = False  # Status is reset after penalty
 
         player = self.get_current_player()
 
@@ -142,24 +143,26 @@ class Game:
             if card_type == CardType.REVERSE:
                 self.game_direction *= -1
                 if len(self.players) == 2:
+                    self.last_player_played_index = self.current_player_index
                     return
             elif card_type == CardType.SKIP:
                 self.next_player()
-                return
             elif card_type == CardType.DRAW_TWO:
                 next_player_index = (self.current_player_index + self.game_direction) % len(self.players)
                 player_to_penalize = self.players[next_player_index]
                 for _ in range(2):
                     player_to_penalize.add_card_to_hand(self.draw_card_from_deck())
                 self.next_player()
-                return
             elif card_type == CardType.WILD_DRAW_FOUR:
                 next_player_index = (self.current_player_index + self.game_direction) % len(self.players)
                 player_to_penalize = self.players[next_player_index]
                 for _ in range(4):
                     player_to_penalize.add_card_to_hand(self.draw_card_from_deck())
                 self.next_player()
-                return
+
+            self.last_player_played_index = self.current_player_index
+            self.next_player()
+
         else:
             # --- Logic for DRAWING a card ---
             drawn_card = self.draw_card_from_deck()
@@ -169,4 +172,5 @@ class Game:
             player.uno_status = False # Drawing always resets uno status
 
             # Simplified rule: turn ends after drawing.
+            self.last_player_played_index = self.current_player_index
             self.next_player()

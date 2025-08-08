@@ -121,3 +121,38 @@ def test_uno_penalty_is_applied():
 
     # P1 should now have 3 cards (1 + 2 penalty)
     assert len(player1.hand) == 3
+
+def test_uno_penalty_after_two_player_reverse():
+    game = setup_game_for_testing(2)
+    player1 = game.players[0]
+
+    game.deck.cards.extend([Card(Color.RED, CardType.NUMBER, 8), Card(Color.BLUE, CardType.NUMBER, 9)])
+    game.current_player_index = 0
+    game.discard_pile.append(Card(Color.GREEN, CardType.NUMBER, 5))
+    game.current_color = Color.GREEN
+
+    # P1 has a Reverse and two other cards
+    player1.hand.extend([
+        Card(Color.GREEN, CardType.REVERSE),
+        Card(Color.GREEN, CardType.NUMBER, 1),
+        Card(Color.GREEN, CardType.NUMBER, 2)
+    ])
+
+    # --- Turn 1: P1 plays Reverse ---
+    game.play_turn(card_index=0) # P1 plays Reverse
+    assert game.current_player_index == 0
+    assert game.last_player_played_index == 0
+
+    # --- Turn 2: P1 plays another card, leaving 1, no UNO call ---
+    game.play_turn(card_index=0, called_uno=False) # P1 plays the Green 1
+
+    assert game.current_player_index == 1
+    assert game.last_player_played_index == 0
+    assert len(player1.hand) == 1
+    assert player1.uno_status is False
+
+    # --- Turn 3: P2 takes their turn, triggering penalty for P1 ---
+    game.play_turn(card_index=None) # P2 draws a card
+
+    # P1 should have been penalized and now has 1 + 2 = 3 cards
+    assert len(player1.hand) == 3

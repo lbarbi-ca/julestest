@@ -145,21 +145,21 @@ class Game:
                     return
             elif card_type == CardType.SKIP:
                 self.next_player()
+                return
             elif card_type == CardType.DRAW_TWO:
                 next_player_index = (self.current_player_index + self.game_direction) % len(self.players)
                 player_to_penalize = self.players[next_player_index]
                 for _ in range(2):
                     player_to_penalize.add_card_to_hand(self.draw_card_from_deck())
                 self.next_player()
+                return
             elif card_type == CardType.WILD_DRAW_FOUR:
                 next_player_index = (self.current_player_index + self.game_direction) % len(self.players)
                 player_to_penalize = self.players[next_player_index]
                 for _ in range(4):
                     player_to_penalize.add_card_to_hand(self.draw_card_from_deck())
                 self.next_player()
-
-            self.next_player()
-
+                return
         else:
             # --- Logic for DRAWING a card ---
             drawn_card = self.draw_card_from_deck()

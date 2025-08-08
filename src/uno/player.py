@@ -4,13 +4,12 @@ class Player:
     def __init__(self, name: str):
         self.name = name
         self.hand = []
+        self.uno_status = False
 
     def add_card_to_hand(self, card: Card):
         self.hand.append(card)
 
     def play_card_from_hand(self, card_index: int) -> Card:
-        if not (0 <= card_index < len(self.hand)):
-            raise IndexError(f"Card index {card_index} is out of bounds for hand of size {len(self.hand)}")
         return self.hand.pop(card_index)
 
     def __str__(self):

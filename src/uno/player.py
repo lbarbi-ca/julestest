@@ -10,6 +10,8 @@ class Player:
         self.hand.append(card)
 
     def play_card_from_hand(self, card_index: int) -> Card:
+        if card_index < 0 or card_index >= len(self.hand):
+            raise IndexError(f"Card index {card_index} is out of bounds for hand of size {len(self.hand)}")
         return self.hand.pop(card_index)
 
     def __str__(self):

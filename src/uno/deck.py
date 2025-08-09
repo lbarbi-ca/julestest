@@ -31,8 +31,6 @@ class Deck:
 
     def draw_card(self):
         if not self.cards:
-            # In a real game, we would reshuffle the discard pile into the deck
-            # For now, we'll just return None
             return None
         return self.cards.pop()
 
